@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -22,7 +23,7 @@ const userSchema = new mongoose.Schema({
         trim: true,
         lowercase: true,
         validate(value) {
-            if(!validator.email(value)) {
+            if(!validator.isEmail(value)) {
                 throw new Error('Email is invalid')
             }
         }
@@ -50,8 +51,7 @@ const userSchema = new mongoose.Schema({
         type: Buffer
     },
     follows: [{
-        follow: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        follow: mongoose.Schema.Types.ObjectId
     }]
 }, {
     timestamps: true
@@ -65,6 +65,10 @@ userSchema.methods.generateAuthToken = async function() {
     await user.save()
 
     return token
+}
+
+userSchema.methods.validatePassword = function() {
+    return (this.password == moment(this.birthDay).format('L').replace(/\//g, ''))
 }
 
 userSchema.methods.toJSON = function() {
