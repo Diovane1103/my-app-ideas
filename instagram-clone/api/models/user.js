@@ -3,9 +3,15 @@ const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
+const genders = require('./genders')
 
 const userSchema = new mongoose.Schema({
     name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    gender: {
         type: String,
         required: true,
         trim: true
@@ -69,6 +75,20 @@ userSchema.methods.generateAuthToken = async function() {
 
 userSchema.methods.validatePassword = function() {
     return (this.password == moment(this.birthDay).format('L').replace(/\//g, ''))
+}
+
+userSchema.methods.validateGender = function() {
+    return genders[this.gender.toUpperCase()] == undefined
+}
+
+userSchema.methods.getAge = function() {
+    const actualDate = new Date()
+    let age = actualDate.getFullYear() - this.birthDay.getFullYear()
+    if(actualDate.getMonth() < this.birthDay.getMonth())
+        age--
+    else if(actualDate.getMonth() == this.birthDay.getMonth() && actualDate.getDay < this.birthDay.getDay()) 
+        age--
+    return age
 }
 
 userSchema.methods.toJSON = function() {
