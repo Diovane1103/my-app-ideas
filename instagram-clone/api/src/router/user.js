@@ -175,42 +175,4 @@ router.get('/:id/avatar', auth, async (req, res) => {
     }
 })
 
-// router.post('/me/image', auth, upload.single('image'), async (req, res) => {
-//     try {
-//         const buffer = await sharp(req.file.buffer).resize({ width: 450, heigth: 300}).png().toBuffer()
-//         req.user.images.push(buffer)
-//         await req.user.save()
-
-//         res.status(200).send(req.user)
-//     } catch (error) {
-//         res.status(500).send(error)
-//     }
-// })
-
-// router.delete('/me/image/:id', auth, async (req, res) => {
-//     try {
-//         req.user.images = req.user.images.filter(img => img.id !== req.params.id)
-//         await req.user.save()
-
-//         res.send()
-//     } catch (error) {
-//         res.status(500).send(error)
-//     }
-// })
-
-// router.get('/:id/image/:imageId', auth, async (req, res) => {
-//     try {
-//         const user = await User.findById(req.params.id)
-        
-//         if(!user || !user.images)
-//             throw new Error({ err: 'The user does not exist or does not have any image!'})
-        
-//         const image = user.images.filter(img => img.id === req.params.imageId)
-//         res.set('Content-Type', 'image/png')
-//         res.send(image)
-//     } catch (error) {
-//         res.status(500).send(error)
-//     }
-// })
-
 module.exports = router

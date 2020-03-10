@@ -6,16 +6,12 @@ const postSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    images: [{
-        image: {
-            type: Buffer
-        }
-    }],
-    videos: [{
-        video: {
-            type: Buffer
-        }
-    }],
+    image: {
+        type: Buffer
+    },
+    video: {
+        type: Buffer
+    },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
