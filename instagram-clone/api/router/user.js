@@ -2,6 +2,7 @@ const express = require('express')
 const moment = require('moment')
 const multer = require('multer')
 const sharp = require('sharp')
+const account = require('./../email/account')
 
 const auth = require('./../middleware/auth')
 const User = require('./../models/user')
@@ -30,11 +31,18 @@ router.post('/signin', async (req, res) => {
         }
         await user.save()
         const token = await user.generateAuthToken()
+        account.welcomeEmail(user.email, user.name)
 
         res.status(201).send({ user, token })
     } catch (error) {
         res.status(500).send(error)
     }
+})
+
+router.delete('/signout', auth, async (req, res) => {
+    await User.findByIdAndDelete(req.user._id)
+    account.cancelationEmail(req.user.email, req.user.name)
+    res.send()
 })
 
 router.post('/login', async (req, res) => {
