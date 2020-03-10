@@ -128,7 +128,6 @@ userSchema.pre('save', async function (next) {
 
 userSchema.pre('remove', async function(next){
     const user = this
-
     await Post.deleteMany({ owner: user._id })
 
     next()
