@@ -1,6 +1,6 @@
 const genders = {
-    MASCULINO: 'masculino',
-    FEMININO: 'feminino'
+    MEN: 'men',
+    WOMEN: 'women'
 }
 
 module.exports = genders

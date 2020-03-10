@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const genders = require('./genders')
+const Post = require('./post')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -48,11 +49,6 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     }],
-    images: [{
-        image: {
-            type: Buffer
-        }   
-    }],
     avatar: {
         type: Buffer
     },
@@ -63,10 +59,16 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 })
 
+userSchema.virtual('posts', {
+    ref: 'Post',
+    localField: '_id',
+    foreignField: 'owner'
+})
+
 userSchema.methods.generateAuthToken = async function() {
     const user = this
     const token = jwt.sign({ _id: user.id.toString() }, process.env.JWT_SECRET)
-
+    
     user.tokens = user.tokens.concat({ token })
     await user.save()
 
@@ -97,7 +99,6 @@ userSchema.methods.toJSON = function() {
 
     delete userObject.password
     delete userObject.avatar
-    delete userObject.images
     delete userObject.tokens
 
     return userObject
@@ -121,6 +122,14 @@ userSchema.pre('save', async function (next) {
 
     if(user.isModified('password'))
        user.password = await bcrypt.hash(user.password, 8)
+
+    next()
+})
+
+userSchema.pre('remove', async function(next){
+    const user = this
+
+    await Post.deleteMany({ owner: user._id })
 
     next()
 })
