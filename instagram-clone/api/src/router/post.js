@@ -53,7 +53,7 @@ router.get('/:id', auth, async (req, res) => {
         if(!post || (!post.image && !post.video)) {
             throw new Error({ err: 'The post does not exist or does not have any image or video!'})
         }
-        console.log(req.file)
+
         const file = {
             type: post.video ? 'video/mp4' : 'image/png',
             buffer: post.video ? post.video : post.image
