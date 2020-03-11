@@ -3,6 +3,7 @@ const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
+
 const genders = require('./genders')
 const Post = require('./post')
 
@@ -61,6 +62,12 @@ const userSchema = new mongoose.Schema({
 
 userSchema.virtual('posts', {
     ref: 'Post',
+    localField: '_id',
+    foreignField: 'owner'
+})
+
+userSchema.virtual('stories', {
+    ref: 'Story',
     localField: '_id',
     foreignField: 'owner'
 })

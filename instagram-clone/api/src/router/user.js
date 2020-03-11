@@ -6,6 +6,9 @@ const account = require('./../email/account')
 
 const auth = require('./../middleware/auth')
 const User = require('./../models/user')
+const permission = require('./../middleware/permission')
+const Story = require('./../models/story')
+const Post = require('./../models/post')
 
 const router = new express.Router()
 const upload = multer({
@@ -85,7 +88,8 @@ router.get('/me', auth, async ({ user }, res) => {
         description: user.description | null,
         gender: user.gender,
         name: user.name,
-        // images: user.images,
+        posts: user.posts,
+        stories: user.stories,
         follows: user.follows,
         birthday: moment(user.birthDay).format('L'),
         age: user.getAge() | null
@@ -170,6 +174,28 @@ router.get('/:id/avatar', auth, async (req, res) => {
         
         res.set('Content-Type', 'image/png')
         res.send(user.avatar)
+    } catch (error) {
+        res.status(500).send(error)
+    }
+})
+
+router.get('/:id/stories', auth, permission, async (req, res) => {
+    try {
+        const stories = await Story.find({ owner: req.params.id })
+
+        res.set('Content-Type', 'multipart/form-data')
+        res.status(200).send(stories)
+    } catch (error) {
+        res.status(500).send(error)
+    }
+})
+
+router.get('/:id/posts', auth, permission, async (req, res) => {
+    try {
+        const posts = await Post.find({ owner: req.params.id })
+
+        res.set('Content-Type', 'multipart/form-data')
+        res.status(200).send(posts)
     } catch (error) {
         res.status(500).send(error)
     }
