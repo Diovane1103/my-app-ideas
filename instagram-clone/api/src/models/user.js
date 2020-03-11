@@ -84,12 +84,16 @@ userSchema.methods.validateGender = function() {
 }
 
 userSchema.methods.getAge = function() {
+    const user = this
     const actualDate = new Date()
-    let age = actualDate.getFullYear() - this.birthDay.getFullYear()
-    if(actualDate.getMonth() < this.birthDay.getMonth())
+    let age = actualDate.getFullYear() - user.birthDay.getFullYear()
+    if(actualDate.getMonth() < user.birthDay.getMonth()) {
+        console.log('Month', user.birthDay.getMonth())
         age--
-    else if(actualDate.getMonth() == this.birthDay.getMonth() && actualDate.getDay < this.birthDay.getDay()) 
+    } else if(actualDate.getMonth() == user.birthDay.getMonth() && actualDate.getDay < user.birthDay.getDay()) {
+        console.log('Day')
         age--
+    }
     return age
 }
 

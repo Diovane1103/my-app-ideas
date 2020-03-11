@@ -40,7 +40,7 @@ router.post('/signin', async (req, res) => {
 })
 
 router.delete('/signout', auth, async (req, res) => {
-    await User.findByIdAndDelete(req.user._id)
+    await req.user.remove()
     account.cancelationEmail(req.user.email, req.user.name)
     res.send()
 })
