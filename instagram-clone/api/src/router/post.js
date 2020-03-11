@@ -12,31 +12,22 @@ const upload = multer({
     }
 })
 
-router.post('/upload/image', auth, upload.single('image'), async (req, res) => {
+router.post('/upload', auth, upload.array('file', 12), async (req, res) => {
     const post = new Post({
         comment: req.body.comment,
         owner: req.user._id
     })
     try {
-        post.image = await sharp(req.file.buffer).resize({ width: 450, heigth: 300 }).png().toBuffer()
+        post.files = await Promise.all(req.files.map(async (f) => {
+            if(!f.originalname.match(/\.(jpg|jpeg|png|mp4)$/))
+                throw new Error('Just accept video and image!')
+            return f.originalname.match(/\.(jpg|jpeg|png)$/) ? 
+                   await sharp(f.buffer).resize({ width: 350, heigth: 300 }).png().toBuffer() :
+                   f.buffer
+        }));
         await post.save()
-
-        res.status(201).send(post)
-    } catch (error) {
-        res.status(500).send(error)
-    }
-})
-
-router.post('/upload/video', auth, upload.single('video'), async (req, res) => {
-    const post = new Post({
-        comment: req.body.comment,
-        owner: req.user._id
-    })
-    try {
-        post.video = req.file.buffer
-        await post.save()
-
-        res.status(201).send(post)
+        
+        res.status(201).send({ _id: post._id, comment: post.comment, owner: post.owner })
     } catch (error) {
         res.status(500).send(error)
     }
@@ -50,17 +41,12 @@ router.delete('/:id', auth, async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id)
-        if(!post || (!post.image && !post.video)) {
+        if(!post || !post.files) {
             throw new Error({ err: 'The post does not exist or does not have any image or video!'})
         }
 
-        const file = {
-            type: post.video ? 'video/mp4' : 'image/png',
-            buffer: post.video ? post.video : post.image
-        }
-
-        res.set('Content-Type', file.type)
-        res.send(file.buffer)
+        res.set('Content-Type', 'multipart/form-data')
+        res.send(post)
     } catch (error) {
         res.status(500).send(error)
     }

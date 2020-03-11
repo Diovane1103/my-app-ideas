@@ -6,12 +6,7 @@ const postSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    image: {
-        type: Buffer
-    },
-    video: {
-        type: Buffer
-    },
+    files: [Buffer],
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -21,15 +16,14 @@ const postSchema = new mongoose.Schema({
     timestamps: true
 })
 
-postSchema.methods.toJSON = function() {
-    const post = this
-    const postObject = post.toObject()
+// postSchema.methods.toJSON = function() {
+//     const post = this
+//     const postObject = post.toObject()
 
-    delete postObject.video
-    delete postObject.image
+//     delete postObject.files
 
-    return postObject
-}
+//     return postObject
+// }
 
 const Post = mongoose.model('Post', postSchema)
 
