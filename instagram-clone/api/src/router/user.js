@@ -42,9 +42,9 @@ router.post('/signin', async (req, res) => {
     }
 })
 
-router.delete('/signout', auth, async (req, res) => {
-    await req.user.remove()
-    account.cancelationEmail(req.user.email, req.user.name)
+router.delete('/signout', auth, async ({user}, res) => {
+    await user.remove()
+    account.cancelationEmail(user.email, user.name)
     res.send()
 })
 
@@ -59,10 +59,10 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.post('/logout', auth, async (req, res) => {
+router.post('/logout', auth, async ({user, tokenUser}, res) => {
     try {
-        req.user.tokens = req.user.tokens.filter((token) => req.token !== token.token)
-        await req.user.save()
+        user.tokens = user.tokens.filter((token) => tokenUser !== token.token)
+        await user.save()
 
         res.send()
     } catch (error) {
@@ -70,10 +70,10 @@ router.post('/logout', auth, async (req, res) => {
     }
 })
 
-router.post('/logoutAll', auth, async (req, res) => {
+router.post('/logoutAll', auth, async ({ user }, res) => {
     try {
-        req.user.tokens = []
-        await req.user.save()
+        user.tokens = []
+        await user.save()
 
         res.send()
     } catch (error) {
@@ -82,22 +82,25 @@ router.post('/logoutAll', auth, async (req, res) => {
 })
 
 router.get('/me', auth, async ({ user }, res) => {
+    const stories = await Story.find({ owner: user._id })
+    const posts = await Post.find({ owner: user._id })
+
     res.status(200).send({
         _id: user._id,
         avatar: user.avatar | null,
         description: user.description | null,
         gender: user.gender,
         name: user.name,
-        posts: user.posts,
-        stories: user.stories,
+        posts: posts,
+        stories: stories,
         follows: user.follows,
         birthday: moment(user.birthDay).format('L'),
         age: user.getAge() | null
     })
 })
 
-router.patch('/me', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
+router.patch('/me', auth, async ({user, body}, res) => {
+    const updates = Object.keys(body)
     const validUpdates = ['description', 'name', 'gender', 'email']
     const isValidOp = updates.every(update => validUpdates.includes(update))
 
@@ -105,10 +108,10 @@ router.patch('/me', auth, async (req, res) => {
         return res.status(400).send({ err: 'Invalid Update!' })
     
     try {
-        updates.forEach(update => req.user[update] = req.body[update])
-        await req.user.save()
+        updates.forEach(update => user[update] = body[update])
+        await user.save()
 
-        res.send(req.user)
+        res.send(user)
     } catch (error) {
         res.status(500).send(error)
     }
