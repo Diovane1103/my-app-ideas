@@ -4,11 +4,11 @@ const multer = require('multer')
 const sharp = require('sharp')
 const account = require('./../email/account')
 
-const auth = require('./../middleware/auth')
 const User = require('./../models/user')
-const permission = require('./../middleware/permission')
 const Story = require('./../models/story')
 const Post = require('./../models/post')
+const permission = require('./../middleware/permission')
+const auth = require('./../middleware/auth')
 
 const router = new express.Router()
 const upload = multer({
@@ -199,6 +199,18 @@ router.get('/:id/posts', auth, permission, async (req, res) => {
 
         res.set('Content-Type', 'multipart/form-data')
         res.status(200).send(posts)
+    } catch (error) {
+        res.status(500).send(error)
+    }
+})
+
+router.get('/:id/profile', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+        const stories = await Story.find({ owner: req.params.id })
+        const posts = await Post.find({ owner: req.params.id })
+
+        res.status(200).send({ user, posts, stories })
     } catch (error) {
         res.status(500).send(error)
     }

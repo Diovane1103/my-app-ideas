@@ -1,6 +1,5 @@
 const Chat = require('./../models/chat')
 const auth = require('./../middleware/auth')
-const socketchat = require('./../chat/socket')
 const participant = require('./../middleware/participant')
 
 const express = require('express')
@@ -10,7 +9,6 @@ router.get('/:id', auth, participant, async (req, res) => {
     try {
         const chat = await Chat.findById(req.params.id)
 
-        
         res.status(200).send(chat)
     } catch (error) {
         res.status(500).send(error)

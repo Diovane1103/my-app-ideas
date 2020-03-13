@@ -12,7 +12,7 @@ const upload = multer({
     },
     fileFilter(req, file, cb) {
         if(!file.originalname.match(/\.(jpg|jpeg|png|gif|mp4)$/)){
-            cb(new Error('Story just support .gif, video and images!'))
+            cb(new Error('Story just support gif, video and images!'))
         }
         cb(undefined, true)
     }
