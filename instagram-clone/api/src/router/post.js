@@ -24,7 +24,7 @@ router.post('/upload', auth, upload.array('file', 12), async (req, res) => {
             return f.originalname.match(/\.(jpg|jpeg|png)$/) ? 
                    await sharp(f.buffer).resize({ width: 350, heigth: 300 }).png().toBuffer() :
                    f.buffer
-        }));
+        }))
         await post.save()
         
         res.status(201).send({ _id: post._id, comment: post.comment, owner: post.owner })

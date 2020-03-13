@@ -87,15 +87,15 @@ router.get('/me', auth, async ({ user }, res) => {
 
     res.status(200).send({
         _id: user._id,
-        avatar: user.avatar | null,
-        description: user.description | null,
+        avatar: user.avatar || null,
+        description: user.description || null,
         gender: user.gender,
         name: user.name,
         posts: posts,
         stories: stories,
         follows: user.follows,
         birthday: moment(user.birthDay).format('L'),
-        age: user.getAge() | null
+        age: user.getAge() || null
     })
 })
 

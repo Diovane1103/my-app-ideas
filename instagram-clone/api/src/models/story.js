@@ -9,9 +9,7 @@ const storySchema = new mongoose.Schema({
         required: true,
         ref: 'User'
     },
-    data: {
-        type: Buffer
-    },
+    data: { },
     dataType: {
         type: String
     },
